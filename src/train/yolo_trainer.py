@@ -1,8 +1,7 @@
 from ultralytics import YOLO
 
 class YoloTrainer:
-    def __init__(self, dataset, model_type="yolov8x.pt", batch_size=6, 
-                 epochs=50, img_size=1280, enable_plots=True):
+    def __init__(self, dataset, batch_size, epochs, img_size, model_type="yolov8x.pt", enable_plots=True):
         self.dataset = dataset
         self.model_type = model_type
         self.batch_size = batch_size
