@@ -1,10 +1,10 @@
 import dotenv
 import os
 import argparse
-import config
 
+from src import config
 from roboflow import Roboflow
-from yolo_trainer import YoloTrainer
+from src.train.yolo_trainer import YoloTrainer
 
 
 class TrainDataset:
