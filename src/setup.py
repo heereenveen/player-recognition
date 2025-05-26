@@ -4,13 +4,13 @@ import gdown
 from pathlib import Path
 
 
-class DownloadStrategy(abc.ABC):
+class DownloadFiles(abc.ABC):
     @abc.abstractmethod
     def download(self, file_id: str, output_path: Path) -> bool:
         pass
 
 
-class GDownStrategy(DownloadStrategy):
+class GDownDownload(DownloadFiles):
     def download(self, file_id: str, output_path: Path) -> bool:
         try:
             url = f"https://drive.google.com/uc?id={file_id}"
@@ -22,7 +22,7 @@ class GDownStrategy(DownloadStrategy):
 
 
 class ProjectSetup:
-    def __init__(self, strategy: DownloadStrategy, data_dir: Path, models: dict):
+    def __init__(self, strategy: DownloadFiles, data_dir: Path, models: dict):
         self.strategy = strategy
         self.data_dir = data_dir
         self.files = models
@@ -45,6 +45,6 @@ class ProjectSetup:
 
 if __name__ == "__main__":
     setup = ProjectSetup(
-        strategy=GDownStrategy(), data_dir=Path("src/data"), models=config.MODELS_FILES
+        strategy=GDownDownload(), data_dir=Path("src/data"), models=config.MODELS_FILES
     )
     setup.setup()
