@@ -45,6 +45,6 @@ class ProjectSetup:
 
 if __name__ == "__main__":
     setup = ProjectSetup(
-        strategy=GDownDownload(), data_dir=Path("src/data"), models=config.MODELS_FILES
+        strategy=GDownDownload(), data_dir=Path("src/data"), models=config.VIDEO_FILES
     )
     setup.setup()
