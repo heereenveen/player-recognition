@@ -5,7 +5,7 @@ import supervision as sv
 from tqdm import tqdm
 
 from models import ModelFactory
-from classifier import TeamClassifier
+from marking.classifier import TeamClassifier
 
 PLAYER_CLASS_ID = 2
 GOALKEEPER_CLASS_ID = 1
@@ -121,21 +121,16 @@ class RadarProcessor:
         self.team_classifier = TeamClassifier(device=device)
         self.tracker = sv.ByteTrack(minimum_consecutive_frames=3)
 
-    def process_video(
-        self,
-        source_path: str,
-        target_path: str,
-    ):
+    def process_frames(self, source_path: str) -> typing.Iterator[np.ndarray]:
+        # Збираємо приклади для класифікатора команд
         self._collect_crops(source_path)
-
+        # Генеруємо кадри
         frames = sv.get_video_frames_generator(source_path)
-        info = sv.VideoInfo.from_video_path(source_path)
-        with sv.VideoSink(target_path, info) as sink:
-            for frame in frames:
-                out = self.strategy.process_frame(
-                    frame, self.models, self.team_classifier, self.tracker
-                )
-                sink.write_frame(out)
+        for frame in frames:
+            out = self.strategy.process_frame(
+                frame, self.models, self.team_classifier, self.tracker
+            )
+            yield out  # повертаємо готовий кадр
 
     def _collect_crops(self, source_path: str) -> None:
         frames = sv.get_video_frames_generator(source_path, stride=self.stride)
@@ -145,6 +140,5 @@ class RadarProcessor:
             det = sv.Detections.from_ultralytics(res)
             players = det[det.class_id == PLAYER_CLASS_ID]
             crops += [sv.crop_image(frame, xyxy) for xyxy in players.xyxy]
-
         if crops:
             self.team_classifier.fit(crops)
